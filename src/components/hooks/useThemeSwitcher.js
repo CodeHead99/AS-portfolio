@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const useThemeSwitcher = () => {
   const preferDarkQuery = "(prefer-color-theme: dark)";
@@ -26,11 +26,26 @@ const useThemeSwitcher = () => {
         }
       }
     };
+    handleChange();
     mediaQuery.addEventListener("change", handleChange);
-    setMode(check);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
 
-  return <div>useThemeSwitcher</div>;
+  useEffect(() => {
+    if (mode === "dark") {
+      window.localStorage.setItem("theme", "dark");
+      document.documentElement.classList.add("dark");
+    }
+    if (mode === "light") {
+      window.localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
+    }
+  }, [mode]);
+
+  return [mode, setMode];
 };
 
 export default useThemeSwitcher;
